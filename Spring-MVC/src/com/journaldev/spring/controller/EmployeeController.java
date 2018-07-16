@@ -8,15 +8,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
 import com.journaldev.spring.dao.EmployeeDAOImpl;
-import com.journaldev.spring.forms.LoginForm;
 import com.journaldev.spring.forms.EmployeeForm;
 import com.journaldev.spring.model.Employee;
 
+/**
+ * @author Ravitosh
+ * 
+ * Controller for Employee view screen.
+ *
+ */
 @Controller
 public class EmployeeController {
 
@@ -37,24 +42,29 @@ public class EmployeeController {
 	 */
 	@RequestMapping(value = "/displayEmplopyee")
 	public String home(Model model) throws JsonProcessingException {
-		String employeeListJson="";
-		List<Employee> employeeList = employeeDAO.list();
-		System.out.println(employeeList);
 		
-		ObjectMapper localObjectMapper = new ObjectMapper();
-		employeeListJson= localObjectMapper.writeValueAsString(employeeList);
-		model.addAttribute("employeeList", employeeListJson);
 		model.addAttribute("employeeForm", new EmployeeForm());
 		
 		return "employee";
 	}
 	
-	@RequestMapping(value="/search",method = RequestMethod.GET)
-	public String searchEmployee(@ModelAttribute("employeeForm")EmployeeForm form,Model model)
+	/**
+	 * Loads employee records from database and displays on view screen
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	@RequestMapping(value="/loadAllEmployees", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String searchEmployee() throws JsonProcessingException
 	{
-		String gridSearchField = form.getGridSearchFields();
+		String employeeListJson="";
 		
+		/*getting employee list from database*/
+		List<Employee> employeeList = employeeDAO.list();
 		
-		return null;
+		ObjectMapper localObjectMapper = new ObjectMapper();
+		employeeListJson= localObjectMapper.writeValueAsString(employeeList);		
+		
+		return employeeListJson;
 	}
 }
